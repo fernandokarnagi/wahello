@@ -1,0 +1,15 @@
+Agentskills Demonstration
+==============================
+Available Skills:
+- addition-skill: Performs addition of two numbers
+- subtraction-skill: Performs subtraction of two numbers
+
+Demonstration:
+5 + 3 = 8
+10 - 4 = 6
+
+Skills loaded from:
+- skills/addition_skill.md
+- skills/subtraction_skill.md
+
+Skill format follows the standard Agent Skills specification with YAML metadata.
