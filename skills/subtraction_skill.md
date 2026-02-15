@@ -1,6 +1,10 @@
-# SKILL.md - Subtraction Skill
+---
+name: subtraction-skill
+description: Performs subtraction of two numbers
+---
 
-## Description
+# Subtraction Skill
+
 This skill performs subtraction of two numbers.
 
 ## Usage
@@ -8,8 +12,11 @@ This skill performs subtraction of two numbers.
 subtract 10 4
 ```
 
-## Implementation
-```python
-def execute(a, b):
-    return a - b
-```
+## Examples
+- Subtract 5 from 10 to get 5
+- Calculate 20 - 8 = 12
+
+## Guidelines
+- The skill expects exactly two numeric arguments
+- Returns the difference of the two numbers
+- Handles both integers and floating point numbers
