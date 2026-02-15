@@ -1,0 +1,58 @@
+BFT Protocol Implementation for Distributed Consensus
+============================================================
+
+=== Network Partition Simulation ===
+Nodes: A,B,C (us-east), D,E (eu-west), F,G (ap-south)
+Partition: eu-west (D,E) isolated from us-east
+Node D has unidirectional link: can receive from us-east but not send
+Node E is fully isolated
+
+Leader set to: A
+
+Client submits write W1 to A (leader)
+Stale client submits write W2 to E (isolated partition)
+
+W1 timestamp: 1
+W2 timestamp: 1
+
+Vector Clocks:
+Node A: {'A': 1}
+Node B: {'B': 0}
+Node C: {'C': 0}
+Node D: {'D': 0}
+Node E: {'E': 1}
+Node F: {'F': 0}
+Node G: {'G': 0}
+
+Byzantine Node F behavior:
+Node F (byzantine) could lie about its timestamps to manipulate consensus
+
+Cryptographic Attestation:
+Node A signature verification: Valid
+Node E signature verification: Valid
+
+BFT Protocol Analysis:
+Total nodes n = 7
+Byzantine faults f = 2
+Minimum k = n - f + 1 = 7 - 2 + 1 = 6
+At least 6 nodes must verify a clock update to ensure safety
+
+=== Analysis ===
+Linearizability: NOT guaranteed in this scenario
+Reason: Network partition and Byzantine node F can cause inconsistent views
+The system cannot maintain linearizability due to:
+1. Isolated partitions preventing consensus
+2. Byzantine node F lying about vector clock timestamps
+3. Unidirectional link preventing proper coordination
+
+=== Conclusion ===
+This implementation demonstrates:
+1. Vector clocks for causal ordering
+2. Cryptographic attestation with signatures
+3. Byzantine fault tolerance principles
+4. Network partition handling
+5. BFT minimum k calculation
+
+Note: This is a simplified demonstration. A full implementation
+would require cryptographic libraries and more sophisticated
+consensus mechanisms.
