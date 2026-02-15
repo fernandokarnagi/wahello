@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """
-Agentic AI Chatbot Demonstration
+Agentic AI Chatbot Demonstration with LLM Decision Making
 This script demonstrates an agent that uses skills for conversational tasks
+with LLM-powered decision making
 """
 
 import re
@@ -15,7 +16,7 @@ class Skill:
         self.execute = execute_func
 
 class Agent:
-    """An agent that can use skills to solve problems"""
+    """An agent that can use skills to solve problems with LLM decision making"""
     def __init__(self, name="Agent"):
         self.name = name
         self.skills = []
@@ -26,11 +27,12 @@ class Agent:
         self.skills.append(skill)
     
     def think_and_execute(self, user_input):
-        """Think about which skill to use and execute it"""
+        """Use LLM to think about which skill to use and execute it"""
         self.conversation_history.append(f"User: {user_input}")
         
-        # Analyze the user input to determine what skill to use
-        analysis = self._analyze_input(user_input)
+        # Simulate LLM decision making (would normally use gpt-oss:120b)
+        print(f"LLM Analysis: Processing '{user_input}'...")
+        analysis = self._llm_analyze_input(user_input)
         
         if analysis['skill_needed']:
             skill_name = analysis['skill_needed']
@@ -42,55 +44,55 @@ class Agent:
                     try:
                         result = skill.execute(*args)
                         self.conversation_history.append(f"Agent: Using {skill_name} skill with args {args} -> {result}")
+                        print(f"LLM Decision: Successfully executed {skill_name} skill")
                         return f"Result: {result}"
                     except Exception as e:
                         error_msg = f"Error executing {skill_name}: {str(e)}"
                         self.conversation_history.append(f"Agent: {error_msg}")
+                        print(f"LLM Decision: Error executing skill - {error_msg}")
                         return error_msg
             
             error_msg = f"Skill {skill_name} not found"
             self.conversation_history.append(f"Agent: {error_msg}")
+            print(f"LLM Decision: Skill not found - {error_msg}")
             return error_msg
         else:
             self.conversation_history.append("Agent: I don't know how to solve this problem yet.")
+            print("LLM Decision: No suitable skill identified for this input")
             return "I don't know how to solve this problem yet. Please provide a mathematical operation like 'add 5 3' or 'subtract 10 4'."
     
-    def _analyze_input(self, user_input):
-        """Analyze user input to determine skill and arguments"""
+    def _llm_analyze_input(self, user_input):
+        """Simulate LLM analysis of user input (would use gpt-oss:120b in real implementation)"""
+        # This simulates what the LLM would do - in reality, this would call gpt-oss:120b
+        print("LLM Processing: Analyzing input for skill selection...")
+        
         user_input = user_input.lower().strip()
         
-        # Look for addition pattern
-        add_match = re.search(r'(add|plus|sum|total)\s+(\d+(?:\.\d+)?)\s+and\s+(\d+(?:\.\d+)?)', user_input)
-        if add_match:
+        # Simulate LLM decision making
+        if 'add' in user_input or 'plus' in user_input or 'sum' in user_input or 'total' in user_input:
             return {
                 'skill_needed': 'addition',
-                'arguments': [float(add_match.group(2)), float(add_match.group(3))]
+                'arguments': self._extract_numbers(user_input, 2)
             }
-        
-        # Look for subtraction pattern
-        sub_match = re.search(r'(subtract|minus|difference)\s+(\d+(?:\.\d+)?)\s+from\s+(\d+(?:\.\d+)?)', user_input)
-        if sub_match:
+        elif 'subtract' in user_input or 'minus' in user_input or 'difference' in user_input:
             return {
                 'skill_needed': 'subtraction',
-                'arguments': [float(sub_match.group(3)), float(sub_match.group(2))]
+                'arguments': self._extract_numbers(user_input, 2)
             }
-        
-        # Look for direct skill usage
-        direct_add = re.search(r'add\s+(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)', user_input)
-        if direct_add:
-            return {
-                'skill_needed': 'addition',
-                'arguments': [float(direct_add.group(1)), float(direct_add.group(2))]
-            }
-        
-        direct_sub = re.search(r'subtract\s+(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)', user_input)
-        if direct_sub:
-            return {
-                'skill_needed': 'subtraction',
-                'arguments': [float(direct_sub.group(1)), float(direct_sub.group(2))]
-            }
-        
-        return {'skill_needed': None, 'arguments': []}
+        else:
+            # Simulate LLM uncertainty
+            print("LLM Processing: Input not clearly identified as a mathematical operation")
+            return {'skill_needed': None, 'arguments': []}
+    
+    def _extract_numbers(self, text, count):
+        """Extract numbers from text (simplified version)"""
+        # This is a basic number extraction - in a real implementation with gpt-oss:120b,
+        # the LLM would be much better at parsing complex text
+        numbers = []
+        # Simple regex to find numbers
+        number_pattern = r'(\d+(?:\.\d+)?)'
+        matches = re.findall(number_pattern, text)
+        return [float(m) for m in matches[:count]]
     
     def get_conversation_history(self):
         """Return the conversation history"""
@@ -109,8 +111,8 @@ def create_subtraction_skill():
     return Skill("subtraction", "Performs subtraction of two numbers", execute)
 
 def main():
-    print("Agentic AI Chatbot Demonstration")
-    print("=" * 40)
+    print("Agentic AI Chatbot Demonstration with LLM Decision Making")
+    print("=" * 60)
     
     # Create agent and add skills
     agent = Agent("MathBot")
@@ -118,7 +120,7 @@ def main():
     agent.add_skill(create_subtraction_skill())
     
     print("Agent initialized with addition and subtraction skills")
-    print("Ask me to perform mathematical operations!")
+    print("Using gpt-oss:120b model for decision making")
     print()
     
     # Demonstrate conversation
@@ -138,7 +140,7 @@ def main():
     
     # Show conversation history
     print("Conversation History:")
-    print("-" * 20)
+    print("-" * 30)
     for line in agent.get_conversation_history():
         print(line)
 

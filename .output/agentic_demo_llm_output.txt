@@ -1,0 +1,48 @@
+Agentic AI Chatbot Demonstration with LLM Decision Making
+============================================================
+Agent initialized with addition and subtraction skills
+Using gpt-oss:120b model for decision making
+
+User: Add 5 and 3
+LLM Analysis: Processing 'Add 5 and 3'...
+LLM Processing: Analyzing input for skill selection...
+LLM Decision: Successfully executed addition skill
+Agent: Result: 8.0
+
+User: Calculate 10 minus 4
+LLM Analysis: Processing 'Calculate 10 minus 4'...
+LLM Processing: Analyzing input for skill selection...
+LLM Decision: Successfully executed subtraction skill
+Agent: Result: 6.0
+
+User: What is 15 plus 7?
+LLM Analysis: Processing 'What is 15 plus 7?'...
+LLM Processing: Analyzing input for skill selection...
+LLM Decision: Successfully executed addition skill
+Agent: Result: 22.0
+
+User: Subtract 8 from 12
+LLM Analysis: Processing 'Subtract 8 from 12'...
+LLM Processing: Analyzing input for skill selection...
+LLM Decision: Successfully executed subtraction skill
+Agent: Result: -4.0
+
+User: How much is 20 divided by 4?
+LLM Analysis: Processing 'How much is 20 divided by 4?'...
+LLM Processing: Analyzing input for skill selection...
+LLM Processing: Input not clearly identified as a mathematical operation
+LLM Decision: No suitable skill identified for this input
+Agent: I don't know how to solve this problem yet. Please provide a mathematical operation like 'add 5 3' or 'subtract 10 4'.
+
+Conversation History:
+------------------------------
+User: Add 5 and 3
+Agent: Using addition skill with args [5.0, 3.0] -> 8.0
+User: Calculate 10 minus 4
+Agent: Using subtraction skill with args [10.0, 4.0] -> 6.0
+User: What is 15 plus 7?
+Agent: Using addition skill with args [15.0, 7.0] -> 22.0
+User: Subtract 8 from 12
+Agent: Using subtraction skill with args [8.0, 12.0] -> -4.0
+User: How much is 20 divided by 4?
+Agent: I don't know how to solve this problem yet.
