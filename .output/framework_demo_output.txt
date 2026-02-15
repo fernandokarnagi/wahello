@@ -1,0 +1,26 @@
+Agent Skills Framework Demonstration
+==================================================
+Loading skills from directory...
+Loaded skill: addition-skill
+Loaded skill: subtraction-skill
+
+Available Skills:
+--------------------
+Name: addition-skill
+Description: Performs addition of two numbers
+
+Name: subtraction-skill
+Description: Performs subtraction of two numbers
+
+Skill Framework Logic:
+--------------------
+1. Discovery: Scan skills directory and parse SKILL.md files
+2. Indexing: Provide only metadata to LLM (name, description)
+3. Selection: LLM decides which skill to use
+4. Execution: Load full skill content when needed
+
+Simulating LLM Selection Process:
+------------------------------
+LLM selects skill: addition-skill
+Loaded full content for addition-skill
+Skill content would now be injected into the conversation...

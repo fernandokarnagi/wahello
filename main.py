@@ -1,148 +1,137 @@
 #!/usr/bin/env python3
 """
-Agentic AI Chatbot Demonstration with LLM Decision Making
-This script demonstrates an agent that uses skills for conversational tasks
-with LLM-powered decision making
+Agent Skills Framework Implementation
+Demonstrating modular, on-demand intelligence using Python
 """
 
-import re
-import json
+import yaml
+import os
+from pathlib import Path
+from typing import List, Dict, Any
 
 class Skill:
-    """Represents a skill that can be executed"""
-    def __init__(self, name, description, execute_func):
+    """Represents a skill with metadata and execution logic"""
+    def __init__(self, name: str, description: str, content: str, path: str):
         self.name = name
         self.description = description
-        self.execute = execute_func
+        self.content = content
+        self.path = path
+    
+    def __repr__(self):
+        return f"Skill(name='{self.name}', description='{self.description}')"
 
-class Agent:
-    """An agent that can use skills to solve problems with LLM decision making"""
-    def __init__(self, name="Agent"):
-        self.name = name
-        self.skills = []
-        self.conversation_history = []
+class AgentSkillsFramework:
+    """Framework for managing agent skills in Python"""
     
-    def add_skill(self, skill):
-        """Add a skill to the agent's repertoire"""
-        self.skills.append(skill)
+    def __init__(self, skills_directory: str = "./skills"):
+        self.skills_directory = Path(skills_directory)
+        self.available_skills: List[Skill] = []
+        self._load_skills()
     
-    def think_and_execute(self, user_input):
-        """Use LLM to think about which skill to use and execute it"""
-        self.conversation_history.append(f"User: {user_input}")
+    def _load_skills(self):
+        """Load all skills from the skills directory"""
+        print("Loading skills from directory...")
         
-        # Simulate LLM decision making (would normally use gpt-oss:120b)
-        print(f"LLM Analysis: Processing '{user_input}'...")
-        analysis = self._llm_analyze_input(user_input)
+        if not self.skills_directory.exists():
+            print(f"Skills directory {self.skills_directory} does not exist")
+            return
         
-        if analysis['skill_needed']:
-            skill_name = analysis['skill_needed']
-            args = analysis['arguments']
+        # Scan for skill directories
+        for skill_dir in self.skills_directory.iterdir():
+            if skill_dir.is_dir():
+                skill_file = skill_dir / "SKILL.md"
+                if skill_file.exists():
+                    skill = self._parse_skill(skill_dir, skill_file)
+                    if skill:
+                        self.available_skills.append(skill)
+                        print(f"Loaded skill: {skill.name}")
+    
+    def _parse_skill(self, skill_dir: Path, skill_file: Path) -> Skill:
+        """Parse a skill from its SKILL.md file"""
+        try:
+            with open(skill_file, 'r') as f:
+                content = f.read()
             
-            # Find and execute the skill
-            for skill in self.skills:
-                if skill.name == skill_name:
-                    try:
-                        result = skill.execute(*args)
-                        self.conversation_history.append(f"Agent: Using {skill_name} skill with args {args} -> {result}")
-                        print(f"LLM Decision: Successfully executed {skill_name} skill")
-                        return f"Result: {result}"
-                    except Exception as e:
-                        error_msg = f"Error executing {skill_name}: {str(e)}"
-                        self.conversation_history.append(f"Agent: {error_msg}")
-                        print(f"LLM Decision: Error executing skill - {error_msg}")
-                        return error_msg
+            # Extract YAML frontmatter
+            if content.startswith('---'):
+                parts = content.split('---', 2)
+                if len(parts) >= 3:
+                    yaml_content = parts[1]
+                    metadata = yaml.safe_load(yaml_content)
+                    name = metadata.get('name', skill_dir.name)
+                    description = metadata.get('description', 'No description')
+                    
+                    return Skill(name, description, content, str(skill_dir))
             
-            error_msg = f"Skill {skill_name} not found"
-            self.conversation_history.append(f"Agent: {error_msg}")
-            print(f"LLM Decision: Skill not found - {error_msg}")
-            return error_msg
-        else:
-            self.conversation_history.append("Agent: I don't know how to solve this problem yet.")
-            print("LLM Decision: No suitable skill identified for this input")
-            return "I don't know how to solve this problem yet. Please provide a mathematical operation like 'add 5 3' or 'subtract 10 4'."
+            print(f"Warning: Could not parse skill {skill_dir.name}")
+            return None
+            
+        except Exception as e:
+            print(f"Error parsing skill {skill_dir.name}: {e}")
+            return None
     
-    def _llm_analyze_input(self, user_input):
-        """Simulate LLM analysis of user input (would use gpt-oss:120b in real implementation)"""
-        # This simulates what the LLM would do - in reality, this would call gpt-oss:120b
-        print("LLM Processing: Analyzing input for skill selection...")
-        
-        user_input = user_input.lower().strip()
-        
-        # Simulate LLM decision making
-        if 'add' in user_input or 'plus' in user_input or 'sum' in user_input or 'total' in user_input:
-            return {
-                'skill_needed': 'addition',
-                'arguments': self._extract_numbers(user_input, 2)
+    def get_available_skills(self) -> List[Dict[str, str]]:
+        """Get list of available skills with name and description"""
+        return [
+            {
+                'name': skill.name,
+                'description': skill.description
             }
-        elif 'subtract' in user_input or 'minus' in user_input or 'difference' in user_input:
-            return {
-                'skill_needed': 'subtraction',
-                'arguments': self._extract_numbers(user_input, 2)
-            }
-        else:
-            # Simulate LLM uncertainty
-            print("LLM Processing: Input not clearly identified as a mathematical operation")
-            return {'skill_needed': None, 'arguments': []}
+            for skill in self.available_skills
+        ]
     
-    def _extract_numbers(self, text, count):
-        """Extract numbers from text (simplified version)"""
-        # This is a basic number extraction - in a real implementation with gpt-oss:120b,
-        # the LLM would be much better at parsing complex text
-        numbers = []
-        # Simple regex to find numbers
-        number_pattern = r'(\d+(?:\.\d+)?)'
-        matches = re.findall(number_pattern, text)
-        return [float(m) for m in matches[:count]]
-    
-    def get_conversation_history(self):
-        """Return the conversation history"""
-        return self.conversation_history
-
-def create_addition_skill():
-    """Create an addition skill"""
-    def execute(a, b):
-        return a + b
-    return Skill("addition", "Performs addition of two numbers", execute)
-
-def create_subtraction_skill():
-    """Create a subtraction skill"""
-    def execute(a, b):
-        return a - b
-    return Skill("subtraction", "Performs subtraction of two numbers", execute)
+    def load_full_skill(self, skill_name: str) -> str:
+        """Load the full content of a skill (simulating LLM tool calling)"""
+        for skill in self.available_skills:
+            if skill.name == skill_name:
+                skill_file = Path(skill.path) / "SKILL.md"
+                if skill_file.exists():
+                    with open(skill_file, 'r') as f:
+                        return f.read()
+        return f"Skill '{skill_name}' not found"
 
 def main():
-    print("Agentic AI Chatbot Demonstration with LLM Decision Making")
-    print("=" * 60)
+    print("Agent Skills Framework Demonstration")
+    print("=" * 50)
     
-    # Create agent and add skills
-    agent = Agent("MathBot")
-    agent.add_skill(create_addition_skill())
-    agent.add_skill(create_subtraction_skill())
+    # Initialize the agent skills framework
+    framework = AgentSkillsFramework()
     
-    print("Agent initialized with addition and subtraction skills")
-    print("Using gpt-oss:120b model for decision making")
-    print()
+    print("\nAvailable Skills:")
+    print("-" * 20)
     
-    # Demonstrate conversation
-    test_inputs = [
-        "Add 5 and 3",
-        "Calculate 10 minus 4",
-        "What is 15 plus 7?",
-        "Subtract 8 from 12",
-        "How much is 20 divided by 4?"
-    ]
+    skills = framework.get_available_skills()
+    if not skills:
+        print("No skills found in the skills directory")
+        return
     
-    for user_input in test_inputs:
-        print(f"User: {user_input}")
-        result = agent.think_and_execute(user_input)
-        print(f"Agent: {result}")
+    for skill in skills:
+        print(f"Name: {skill['name']}")
+        print(f"Description: {skill['description']}")
         print()
     
-    # Show conversation history
-    print("Conversation History:")
+    print("Skill Framework Logic:")
+    print("-" * 20)
+    print("1. Discovery: Scan skills directory and parse SKILL.md files")
+    print("2. Indexing: Provide only metadata to LLM (name, description)")
+    print("3. Selection: LLM decides which skill to use")
+    print("4. Execution: Load full skill content when needed")
+    
+    # Simulate LLM selection process
+    print("\nSimulating LLM Selection Process:")
     print("-" * 30)
-    for line in agent.get_conversation_history():
-        print(line)
+    
+    # This simulates what LLM would do - in a real implementation,
+    # the LLM would analyze user input and call appropriate skills
+    selected_skill = "addition-skill" if skills else None
+    
+    if selected_skill:
+        print(f"LLM selects skill: {selected_skill}")
+        full_skill_content = framework.load_full_skill(selected_skill)
+        print(f"Loaded full content for {selected_skill}")
+        print("Skill content would now be injected into the conversation...")
+    else:
+        print("No suitable skill identified")
 
 if __name__ == "__main__":
     main()
